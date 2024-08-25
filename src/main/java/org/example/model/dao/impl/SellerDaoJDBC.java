@@ -6,7 +6,6 @@ import org.example.model.dao.SellerDao;
 import org.example.model.entities.Department;
 import org.example.model.entities.Seller;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +60,29 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void update(Seller dp) {
+        PreparedStatement ps = null;
+        try{
+            ps = conn.prepareStatement(
+                    "UPDATE seller "
+                            + "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
+                            + "WHERE "
+                            + "Id = ?"
+            );
 
+            ps.setString(1, dp.getName());
+            ps.setString(2, dp.getEmail());
+            ps.setDate(3, new Date(dp.getBirthDate().getTime()));
+            ps.setDouble(4, dp.getBaseSalary());
+            ps.setInt(5, dp.getDepartment().getId());
+            ps.setInt(6, dp.getId());
+
+            ps.executeUpdate();
+
+        }catch (SQLException e){
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(ps);
+        }
     }
 
     @Override
